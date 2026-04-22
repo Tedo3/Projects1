@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TedoBet Pro</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+header {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.container {
+  display: flex;
+}
+
+.matches {
+  width: 70%;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.match {
+  background: #020617;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.odds button {
+  margin: 5px;
+  padding: 10px;
+  background: #1e293b;
+  color: white;
+  border: 1px solid #22c55e;
+  cursor: pointer;
+}
+
+.odds button.active {
+  background: #22c55e;
+  color: #022c22;
+}
+
+.slip {
+  width: 30%;
+  background: #020617;
+  padding: 20px;
+  border-left: 2px solid #22c55e;
+}
+
+.slip-item {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+button.place {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  background: #22c55e;
+  border: none;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>TedoBet Pro</h2>
+</header>
+
+<div class="container">
+
+<div class="matches">
+
+<div class="match">
+  <h3>Барселона vs Реал Мадрид</h3>
+  <div class="odds">
+    <button onclick="addBet(this,'Барселона vs Реал','1',1.95)">1 (1.95)</button>
+    <button onclick="addBet(this,'Барселона vs Реал','X',3.40)">X (3.40)</button>
+    <button onclick="addBet(this,'Барселона vs Реал','2',3.80)">2 (3.80)</button>
+  </div>
+</div>
+
+<div class="match">
+  <h3>Лейкърс vs Селтикс</h3>
+  <div class="odds">
+    <button onclick="addBet(this,'Лейкърс vs Селтикс','1',1.70)">1 (1.70)</button>
+    <button onclick="addBet(this,'Лейкърс vs Селтикс','2',2.10)">2 (2.10)</button>
+  </div>
+</div>
+
+</div>
+
+<div class="slip">
+  <h3>Твоят фиш</h3>
+  <div id="bets"></div>
+
+  <input type="number" id="stake" placeholder="Сума (лв)" oninput="calculate()"/>
+
+  <p>Общ коефициент: <span id="totalOdds">1.00</span></p>
+  <p>Печалба: <span id="profit">0.00</span> лв</p>
+
+  <button class="place" onclick="placeBet()">Заложи</button>
+</div>
+
+</div>
+
+<script>
+let bets = [];
+
+function addBet(btn, match, pick, odd) {
+  document.querySelectorAll('.odds button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  bets = bets.filter(b => b.match !== match);
+  bets.push({match, pick, odd});
+
+  renderBets();
+}
+
+function renderBets() {
+  let container = document.getElementById("bets");
+  container.innerHTML = "";
+
+  bets.forEach((b, i) => {
+    container.innerHTML += `
+      <div class="slip-item">
+        ${b.match} - ${b.pick} (${b.odd})
+        <button onclick="removeBet(${i})">❌</button>
+      </div>
+    `;
+  });
+
+  calculate();
+}
+
+function removeBet(index) {
+  bets.splice(index,1);
+  renderBets();
+}
+
+function calculate() {
+  let stake = parseFloat(document.getElementById("stake").value) || 0;
+
+  let totalOdds = bets.reduce((acc, b) => acc * b.odd, 1);
+
+  document.getElementById("totalOdds").innerText = totalOdds.toFixed(2);
+  document.getElementById("profit").innerText = (stake * totalOdds).toFixed(2);
+}
+
+function placeBet() {
+  if (bets.length === 0) {
+    alert("Няма избрани залози!");
+    return;
+  }
+
+  let stake = document.getElementById("stake").value;
+  if (!stake || stake <= 0) {
+    alert("Въведи валидна сума!");
+    return;
+  }
+
+  alert("Залогът е приет (симулация)");
+}
+</script>
+
+</body>
+</html>
+
